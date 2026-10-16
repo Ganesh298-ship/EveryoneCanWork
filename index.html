@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EveryoneCanWork - Resume Builder</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        header {
+            background: #174c43;
+            color: white;
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        main {
+            max-width: 950px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        h2 {
+            color: #174c43;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 14px 0 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        button {
+            background: #174c43;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 12px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 8px 5px 0 0;
+        }
+
+        button:hover {
+            background: #246c5e;
+        }
+
+        .secondary {
+            background: #555;
+        }
+
+        #resume {
+            background: white;
+            padding: 28px;
+            border: 1px solid #ddd;
+            overflow-wrap: anywhere;
+        }
+
+        #resume h1 {
+            color: #174c43;
+            margin-bottom: 4px;
+        }
+
+        #resume h3 {
+            color: #174c43;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .resume-section {
+            margin-top: 20px;
+        }
+
+        .muted {
+            color: #555;
+            font-size: 14px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            header, #formCard, #previewTitle, .no-print {
+                display: none !important;
+            }
+
+            main {
+                margin: 0;
+                padding: 0;
+                max-width: none;
+            }
+
+            .card {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            #resume {
+                border: none;
+                padding: 10px;
+            }
+
+            #resume h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>EveryoneCanWork</h1>
+    <p>Create your resume easily, step by step.</p>
+</header>
+
+<main>
+
+    <section class="card" id="formCard">
+        <h2>Let's create your resume</h2>
+        <p>Enter your details below. You don't need to fill in every field.</p>
+
+        <form id="resumeForm">
+            <h3>Personal Details</h3>
+
+            <label for="name">Your full name *</label>
+            <input id="name" required placeholder="Enter your name">
+
+            <label for="job">Job you want</label>
+            <input id="job" placeholder="Example: Shop Assistant">
+
+            <label for="email">Email address</label>
+            <input id="email" type="email" placeholder="you@example.com">
+
+            <label for="phone">Phone number</label>
+            <input id="phone" type="tel" placeholder="Your phone number">
+
+            <label for="location">City or location</label>
+            <input id="location" placeholder="Your city">
+
+            <h3>About You</h3>
+
+            <label for="summary">Tell us about yourself</label>
+            <textarea id="summary"
+                placeholder="Example: I enjoy helping customers and working in a team."></textarea>
+
+            <h3>Education</h3>
+
+            <label for="education">Your education</label>
+            <textarea id="education"
+                placeholder="School, qualification, college or training"></textarea>
+
+            <h3>Skills</h3>
+
+            <label for="skills">What can you do?</label>
+            <textarea id="skills"
+                placeholder="Example: Customer service, cooking, typing, Python"></textarea>
+
+            <h3>Work Experience</h3>
+
+            <label for="experience">Have you worked before?</label>
+            <textarea id="experience"
+                placeholder="Describe your previous work, responsibilities and experience"></textarea>
+
+            <h3>Projects and Achievements</h3>
+
+            <label for="projects">Projects, certificates or achievements</label>
+            <textarea id="projects"
+                placeholder="Mention any relevant projects, training or achievements"></textarea>
+
+            <button type="submit">Create My Resume</button>
+            <button type="reset" class="secondary">Clear Form</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2 id="previewTitle">Your Resume Preview</h2>
+
+        <div id="resume" aria-live="polite">
+            <p class="muted">
+                Your resume will appear here after you fill in your name
+                and click "Create My Resume".
+            </p>
+        </div>
+
+        <div class="no-print">
+            <button id="printBtn" type="button">Print / Save as PDF</button>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    const form = document.getElementById("resumeForm");
+    const resume = document.getElementById("resume");
+
+    function getValue(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function addSection(title, value) {
+        if (!value) return "";
+
+        return `
+            <section class="resume-section">
+                <h3>${title}</h3>
+                <p>${escapeHTML(value).replace(/\n/g, "<br>")}</p>
+            </section>
+        `;
+    }
+
+    function escapeHTML(value) {
+        return value.replace(/[&<>"']/g, function (char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char];
+        });
+    }
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name = getValue("name");
+
+        if (!name) {
+            alert("Please enter your name.");
+            return;
+        }
+
+        const job = getValue("job");
+        const email = getValue("email");
+        const phone = getValue("phone");
+        const location = getValue("location");
+
+        const contact = [email, phone, location]
+            .filter(Boolean)
+            .map(escapeHTML)
+            .join(" | ");
+
+        resume.innerHTML = `
+            <h1>${escapeHTML(name)}</h1>
+            ${job ? `<h2>${escapeHTML(job)}</h2>` : ""}
+            ${contact ? `<p class="muted">${contact}</p>` : ""}
+
+            ${addSection("Profile", getValue("summary"))}
+            ${addSection("Education", getValue("education"))}
+            ${addSection("Skills", getValue("skills"))}
+            ${addSection("Work Experience", getValue("experience"))}
+            ${addSection("Projects and Achievements", getValue("projects"))}
+        `;
+
+        document.getElementById("previewTitle").textContent =
+            "Your Resume Preview";
+
+        resume.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    document.getElementById("printBtn").addEventListener("click", function () {
+        window.print();
+    });
+
+    form.addEventListener("reset", function () {
+        setTimeout(function () {
+            resume.innerHTML = `
+                <p class="muted">
+                    Your resume will appear here after you fill in your name
+                    and click "Create My Resume".
+                </p>
+            `;
+        }, 0);
+    });
+</script>
+
+</body>
+</html>
